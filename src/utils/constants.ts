@@ -1,14 +1,17 @@
 export const DESIGNATIONS = [
+  'Fornt Seller',
+  'Upseller',
   'General Staff',
-  'Sales',
+  'Graphic Designer',
+  'Marketer',
+  'Developer',
   'Admin',
   'Manager',
   'HR',
-  'Finance',
 ] as const;
 
 export const ADMIN_ROLES = ['Admin', 'Manager'] as const;
-export const SALES_ROLES = ['Sales'] as const;
+export const SALES_ROLES = ['Upseller', 'Fornt Seller'] as const;
 
 export const GATEWAYS = [
   { id: 'stripe', name: 'Stripe', icon: '💳' },
