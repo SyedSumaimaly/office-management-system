@@ -1,37 +1,19 @@
 import { useState, useEffect, useCallback } from 'react';
 import { AuthUser, LoginCredentials, CreateEmployeeData, UserRole } from '@/types/auth';
 import { generateId } from '@/utils/constants';
+import { API_BASE_URL } from "@/config/api";
+import axios from 'axios';
+
 
 const AUTH_STORAGE_KEY = 'office_dashboard_auth';
 const USERS_STORAGE_KEY = 'office_dashboard_users';
 
-// Default super admin
-const DEFAULT_SUPER_ADMIN: AuthUser & { password: string } = {
-  id: 'super_admin_001',
-  email: 'admin@company.com',
-  password: 'admin123',
-  name: 'Super Admin',
-  role: 'super_admin',
-  createdAt: new Date(),
-};
-
-function getStoredUsers(): (AuthUser & { password: string; designation?: string })[] {
-  const stored = localStorage.getItem(USERS_STORAGE_KEY);
-  if (stored) {
-    const users = JSON.parse(stored);
-    return users.map((u: any) => ({ ...u, createdAt: new Date(u.createdAt) }));
-  }
-  return [DEFAULT_SUPER_ADMIN];
-}
-
-function saveUsers(users: (AuthUser & { password: string; designation?: string })[]) {
-  localStorage.setItem(USERS_STORAGE_KEY, JSON.stringify(users));
-}
 
 export function useAuth() {
   const [user, setUser] = useState<AuthUser | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
+  // Load user from local storage
   useEffect(() => {
     const stored = localStorage.getItem(AUTH_STORAGE_KEY);
     if (stored) {
@@ -41,89 +23,146 @@ export function useAuth() {
     setIsLoading(false);
   }, []);
 
-  const loginSuperAdmin = useCallback(async (credentials: LoginCredentials): Promise<{ success: boolean; error?: string }> => {
-    const users = getStoredUsers();
-    const foundUser = users.find(
-      u => u.email === credentials.email && u.password === credentials.password && u.role === 'super_admin'
-    );
 
-    if (foundUser) {
-      const { password, ...userWithoutPassword } = foundUser;
-      setUser(userWithoutPassword);
-      localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(userWithoutPassword));
-      return { success: true };
+  // ---------------------------------------------
+  // ⭐ SUPER ADMIN LOGIN (Connects to backend)
+  // ---------------------------------------------
+  const loginSuperAdmin = useCallback(async (credentials: LoginCredentials) => {
+    try {
+      const res = await axios.post(`${API_BASE_URL}/auth/admin/login`, credentials);
+
+      if (res.status === 200 && res.data.user && res.data.token) {
+        const user = {
+          id: res.data.user._id,               // FIX HERE
+          name: res.data.user.name,
+          email: res.data.user.email,
+          role: "super_admin",
+          createdAt: res.data.user.createdAt
+        };
+
+        const token = res.data.token;
+
+        setUser(user);
+        localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(user));
+        localStorage.setItem("adminToken", token);
+
+        return { success: true };
+      } else {
+        return { success: false, error: "Login failed: Invalid response from server" };
+      }
+    } catch (error: any) {
+      const errorMsg =
+        error.response?.data?.error ||
+        error.response?.data?.message ||
+        error.message ||
+        "Login failed";
+      return { success: false, error: errorMsg };
     }
-    return { success: false, error: 'Invalid credentials or not a Super Admin' };
   }, []);
 
-  const loginEmployee = useCallback(async (credentials: LoginCredentials): Promise<{ success: boolean; error?: string }> => {
-    const users = getStoredUsers();
-    const foundUser = users.find(
-      u => u.email === credentials.email && u.password === credentials.password && u.role === 'employee'
-    );
 
-    if (foundUser) {
-      const { password, ...userWithoutPassword } = foundUser;
-      setUser(userWithoutPassword);
-      localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(userWithoutPassword));
-      return { success: true };
-    }
-    return { success: false, error: 'Invalid credentials or account not found' };
-  }, []);
 
+
+
+  // ---------------------------------------------
+  // ⭐ EMPLOYEE LOGIN (NOT IMPLEMENTED IN BACKEND)
+  // Keep as placeholder until backend created
+  // ---------------------------------------------
+  const loginEmployee = useCallback(
+    async (): Promise<{ success: boolean; error?: string }> => {
+      return { success: false, error: "Employee login not connected to backend yet." };
+    },
+    []
+  );
+
+  // ---------------------------------------------
+  // ⭐ LOGOUT
+  // ---------------------------------------------
   const logout = useCallback(() => {
     setUser(null);
     localStorage.removeItem(AUTH_STORAGE_KEY);
+    localStorage.removeItem("adminToken");
   }, []);
 
-  const createEmployee = useCallback(async (data: CreateEmployeeData): Promise<{ success: boolean; error?: string; employee?: AuthUser }> => {
-    const users = getStoredUsers();
-    
-    if (users.some(u => u.email === data.email)) {
-      return { success: false, error: 'Email already exists' };
+  // ---------------------------------------------
+  // ⭐ CREATE EMPLOYEE (Backend)
+  // ---------------------------------------------
+  const createEmployee = useCallback(
+    async (
+      data: CreateEmployeeData
+    ): Promise<{ success: boolean; error?: string; employee?: AuthUser }> => {
+      try {
+        const res = await fetch(`${API_BASE_URL}/employees`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${localStorage.getItem("adminToken")}`,
+          },
+          body: JSON.stringify(data),
+        });
+
+        const result = await res.json();
+
+        if (!result.success) {
+          return { success: false, error: result.error };
+        }
+
+        return {
+          success: true,
+          employee: result.employee,
+        };
+      } catch (err) {
+        return { success: false, error: "Server error while creating employee" };
+      }
+    },
+    []
+  );
+
+  // ---------------------------------------------
+  // ⭐ GET EMPLOYEES (Backend)
+  // ---------------------------------------------
+  const getEmployees = useCallback(async () => {
+    try {
+      const res = await fetch(`${API_BASE_URL}/employees`, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("adminToken")}`,
+        },
+      });
+
+      const result = await res.json();
+      if (result.success) return result.employees;
+      return [];
+    } catch {
+      return [];
     }
-
-    const newEmployee: AuthUser & { password: string; designation: string } = {
-      id: `emp_${generateId().slice(0, 8)}`,
-      email: data.email,
-      password: data.password,
-      name: data.name,
-      role: 'employee',
-      designation: data.designation,
-      createdAt: new Date(),
-      createdBy: user?.id,
-    };
-
-    users.push(newEmployee);
-    saveUsers(users);
-
-    const { password, ...employeeWithoutPassword } = newEmployee;
-    return { success: true, employee: employeeWithoutPassword };
-  }, [user?.id]);
-
-  const getEmployees = useCallback((): (AuthUser & { designation?: string })[] => {
-    const users = getStoredUsers();
-    return users
-      .filter(u => u.role === 'employee')
-      .map(({ password, ...rest }) => rest);
   }, []);
 
-  const deleteEmployee = useCallback((employeeId: string): boolean => {
-    const users = getStoredUsers();
-    const filtered = users.filter(u => u.id !== employeeId);
-    if (filtered.length < users.length) {
-      saveUsers(filtered);
-      return true;
+  // ---------------------------------------------
+  // ⭐ DELETE EMPLOYEE (Backend)
+  // ---------------------------------------------
+  const deleteEmployee = useCallback(async (employeeId: string) => {
+    try {
+      const res = await fetch(`${API_BASE_URL}/employees/${employeeId}`, {
+        method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("adminToken")}`,
+        },
+      });
+
+      const result = await res.json();
+      return result.success;
+    } catch {
+      return false;
     }
-    return false;
   }, []);
 
   return {
     user,
     isLoading,
     isAuthenticated: !!user,
-    isSuperAdmin: user?.role === 'super_admin',
-    isEmployee: user?.role === 'employee',
+    isSuperAdmin: user?.role === "super_admin",
+    isEmployee: user?.role === "employee",
+
     loginSuperAdmin,
     loginEmployee,
     logout,

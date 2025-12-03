@@ -17,7 +17,7 @@ export default function AdminLogin() {
   const navigate = useNavigate();
   const { toast } = useToast();
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
 
