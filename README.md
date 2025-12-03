@@ -1,73 +1,104 @@
-# Welcome to your Lovable project
+# 🏢 Office Management System - Frontend Application
 
-## Project info
+This repository contains the source code for the **Frontend Application** of the Office Management System (OMS). This application provides the interactive user interface for managing all the office operations and communicates with the separate [OMS Backend API](https://www.google.com/search?q=%23backend) to retrieve and persist data.
 
-**URL**: https://lovable.dev/projects/018a9827-15b8-468c-9f46-14bbbf33e5c2
+The system is designed to create a streamlined, efficient, and user-friendly experience for office administrators and employees.
 
-## How can I edit this code?
+-----
 
-There are several ways of editing your application.
+## ✨ Key Features
 
-**Use Lovable**
+The frontend application provides the following functional interfaces:
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/018a9827-15b8-468c-9f46-14bbbf33e5c2) and start prompting.
+  * **Intuitive Dashboard:** A central hub displaying key performance indicators (KPIs) and a summary of current activities.
+  * **Employee Management:** Full CRUD (Create, Read, Update, Delete) interface for managing employee profiles, roles, and status.
+  * **Client Management:** Dedicated views for tracking client details, project associations, and communication history.
+  * **Inventory Tracking:** A system to monitor office assets, equipment availability, and supply levels.
+  * **Document Access:** A secure portal for viewing, uploading, and organizing crucial office documents.
+  * **Responsive Design:** Optimized layout for seamless use on various devices (desktop, tablet, and mobile).
 
-Changes made via Lovable will be committed automatically to this repo.
+-----
 
-**Use your preferred IDE**
+## 🛠️ Technology Stack
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+The application is built using a modern, component-based architecture for performance and maintainability.
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+  * **Frontend Framework:** (e.g., **React.js** or another modern JavaScript framework)
+  * **Styling:** (e.g., CSS/SCSS, Tailwind CSS, or Material-UI)
+  * **API Client:** Axios or Fetch API for connecting to the RESTful backend.
 
-Follow these steps:
+-----
 
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
+## 🚀 Getting Started
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
+Follow these instructions to get a copy of the project up and running on your local machine.
 
-# Step 3: Install the necessary dependencies.
-npm i
+### Prerequisites
 
-# Step 4: Start the development server with auto-reloading and an instant preview.
-npm run dev
-```
+1.  **Node.js** (LTS version recommended)
+2.  **npm** (Node Package Manager) or **yarn**
 
-**Edit a file directly in GitHub**
+### Installation & Setup
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+1.  **Clone the repository:**
 
-**Use GitHub Codespaces**
+    ```bash
+    git clone https://github.com/SyedSumaimaly/office-management-system.git
+    cd office-management-system
+    ```
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+2.  **Install dependencies:**
 
-## What technologies are used for this project?
+    ```bash
+    npm install
+    # or
+    # yarn install
+    ```
 
-This project is built with:
+3.  **Configure API Endpoint:**
+    Create a file named `.env` in the root directory of the project to set the environment variable pointing to your running backend:
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+    ```
+    # Example .env file content
+    REACT_APP_API_BASE_URL=http://localhost:5000/api
+    ```
 
-## How can I deploy this project?
+    *(Note: Adjust the port and URL if your backend is running on a different location.)*
 
-Simply open [Lovable](https://lovable.dev/projects/018a9827-15b8-468c-9f46-14bbbf33e5c2) and click on Share -> Publish.
+4.  **Run the application:**
 
-## Can I connect a custom domain to my Lovable project?
+    ```bash
+    npm start
+    # or
+    # yarn start
+    ```
 
-Yes, you can!
+    The application will typically open automatically in your web browser at `http://localhost:3000`.
 
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
+-----
 
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/features/custom-domain#custom-domain)
+## 🔗 Backend
+
+This application requires the companion backend API to function.
+
+**Backend Repository:** [SyedSumaimaly/office-management-system-backend](https://github.com/SyedSumaimaly/office-management-system-backend)
+
+-----
+
+## 🤝 Contributing
+
+Contributions are welcome\! If you have suggestions or find bugs, please follow the standard GitHub workflow:
+
+1.  Fork the Project.
+2.  Create your Feature Branch (`git checkout -b feature/NewFeature`).
+3.  Commit your Changes (`git commit -m 'feat: Add some AmazingFeature'`).
+4.  Push to the Branch (`git push origin feature/NewFeature`).
+5.  Open a Pull Request.
+
+-----
+
+## 📧 Contact
+
+Syed Sumaim Aly - www.linkedin.com/in/syed-sumaim-ali
+
+Project Link: [https://github.com/SyedSumaimaly/office-management-system](https://github.com/SyedSumaimaly/office-management-system)
