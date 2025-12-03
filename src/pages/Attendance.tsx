@@ -5,9 +5,15 @@ import { Button } from '@/components/ui/button';
 import { Clock, Play, Square, Timer } from 'lucide-react';
 import { formatTime, formatDuration, getTodayKey } from '@/utils/constants';
 
+interface AttendanceState {
+  clockInTime: Date | null;
+  clockOutTime: Date | null;
+  status: 'ClockedIn' | 'ClockedOut';
+}
+
 export default function Attendance() {
   const { user } = useAuth();
-  const [attendance, setAttendance] = useState(() => {
+  const [attendance, setAttendance] = useState<AttendanceState>(() => {
     const stored = localStorage.getItem(`attendance_${user?.id}_${getTodayKey()}`);
     if (stored) {
       const parsed = JSON.parse(stored);
@@ -25,8 +31,7 @@ export default function Attendance() {
     if (attendance.status === 'ClockedIn' && attendance.clockInTime) {
       const interval = setInterval(() => {
         const now = new Date();
-        // Removed the non-null assertion operator (!) as it's not needed in JS
-        const diff = Math.floor((now.getTime() - attendance.clockInTime.getTime()) / 60000); 
+        const diff = Math.floor((now.getTime() - attendance.clockInTime!.getTime()) / 60000);
         setElapsedMinutes(diff);
       }, 1000);
       return () => clearInterval(interval);
@@ -35,8 +40,7 @@ export default function Attendance() {
     }
   }, [attendance.status, attendance.clockInTime]);
 
-  // Removed type annotation for newState
-  const saveAttendance = (newState) => {
+  const saveAttendance = (newState: AttendanceState) => {
     localStorage.setItem(`attendance_${user?.id}_${getTodayKey()}`, JSON.stringify(newState));
     setAttendance(newState);
   };

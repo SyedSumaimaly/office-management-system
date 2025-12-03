@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-// Removed: import { useAuth } from '@/hooks/useAuth';
+import { useAuth } from '@/hooks/useAuth';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -8,43 +8,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { UserPlus, Mail, Lock, User, Briefcase, Eye, EyeOff, Copy, Check } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
-// Removed: import { DESIGNATIONS } from '@/utils/constants';
-
-// --- MOCK IMPLEMENTATIONS TO RESOLVE COMPILATION ERRORS ---
-
-// Mock implementation of DESIGNATIONS
-const DESIGNATIONS = [
-  "Software Engineer",
-  "Product Manager",
-  "HR Specialist",
-  "Financial Analyst",
-  "Sales Executive",
-  "Operations Coordinator"
-];
-
-// Mock implementation of useAuth hook
-const useAuth = () => {
-    // Mock function for creating an employee
-    const createEmployee = async ({ name, email, password, designation }) => {
-        console.log(`Mocking employee creation for: ${email}`);
-        
-        // Simple mock success/failure logic for demonstration
-        if (email.toLowerCase().includes('fail')) {
-            return { success: false, error: "Mock API Error: Invalid data detected." };
-        }
-
-        // Simulate successful creation
-        return { success: true };
-    };
-
-    // Assume Super Admin role is always true for testing this page functionality
-    const isSuperAdmin = true;
-
-    return { createEmployee, isSuperAdmin };
-};
-
-// --- END MOCK IMPLEMENTATIONS ---
-
+import { DESIGNATIONS } from '@/utils/constants';
 
 export default function CreateEmployee() {
   const [name, setName] = useState('');
@@ -53,9 +17,8 @@ export default function CreateEmployee() {
   const [designation, setDesignation] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [createdEmployee, setCreatedEmployee] = useState(null);
+  const [createdEmployee, setCreatedEmployee] = useState<{ email: string; password: string } | null>(null);
   const [copied, setCopied] = useState(false);
-  // useAuth is now the local mock function
   const { createEmployee, isSuperAdmin } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -72,7 +35,7 @@ export default function CreateEmployee() {
     );
   }
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
 
@@ -92,26 +55,11 @@ export default function CreateEmployee() {
     setIsSubmitting(false);
   };
 
-  // Note: document.execCommand('copy') is generally preferred in this environment 
-  // over navigator.clipboard.writeText due to iframe security context limitations, 
-  // but keeping the original code's preference here.
   const copyCredentials = async () => {
     if (createdEmployee) {
-      // Fallback for document.execCommand('copy') if navigator.clipboard fails
-      try {
-        await navigator.clipboard.writeText(
-          `Email: ${createdEmployee.email}\nPassword: ${createdEmployee.password}\nLogin URL: ${window.location.origin}/employee-login`
-        );
-      } catch (err) {
-        // Fallback implementation if navigator.clipboard fails
-        const tempElement = document.createElement('textarea');
-        tempElement.value = `Email: ${createdEmployee.email}\nPassword: ${createdEmployee.password}\nLogin URL: ${window.location.origin}/employee-login`;
-        document.body.appendChild(tempElement);
-        tempElement.select();
-        document.execCommand('copy');
-        document.body.removeChild(tempElement);
-      }
-
+      await navigator.clipboard.writeText(
+        `Email: ${createdEmployee.email}\nPassword: ${createdEmployee.password}\nLogin URL: ${window.location.origin}/employee-login`
+      );
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
     }
