@@ -35,12 +35,13 @@ export default function CreateEmployee() {
     );
   }
 
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
 
     const result = await createEmployee({ name, email, password, designation });
-    
+
     if (result.success) {
       toast({ title: 'Employee created!', description: `${name} has been added successfully.` });
       setCreatedEmployee({ email, password });
@@ -51,7 +52,7 @@ export default function CreateEmployee() {
     } else {
       toast({ title: 'Error', description: result.error, variant: 'destructive' });
     }
-    
+
     setIsSubmitting(false);
   };
 

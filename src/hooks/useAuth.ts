@@ -101,18 +101,28 @@ export function useAuth() {
           body: JSON.stringify(data),
         });
 
+        if (!res.ok) {
+          const errorResult = await res.json();
+
+          return {
+            success: false,
+            error: errorResult.error || `Server responded with status ${res.status}`
+          };
+        }
+
         const result = await res.json();
 
-        if (!result.success) {
-          return { success: false, error: result.error };
+        if (!result.user && !result.employee) {
+          return { success: false, error: "Successful response but employee data is missing." };
         }
 
         return {
           success: true,
-          employee: result.employee,
+          employee: result.user || result.employee,
         };
       } catch (err) {
-        return { success: false, error: "Server error while creating employee" };
+        console.error("Fetch/Network Error:", err);
+        return { success: false, error: "Network error or server unreachable." };
       }
     },
     []
@@ -121,22 +131,32 @@ export function useAuth() {
   // ---------------------------------------------
   // ⭐ GET EMPLOYEES (Backend)
   // ---------------------------------------------
-  const getEmployees = useCallback(async () => {
+  const getEmployees = async () => {
     try {
+      const token = localStorage.getItem("adminToken");
       const res = await fetch(`${API_BASE_URL}/employees`, {
+        method: "GET",
         headers: {
-          Authorization: `Bearer ${localStorage.getItem("adminToken")}`,
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
         },
       });
 
-      const result = await res.json();
-      if (result.success) return result.employees;
-      return [];
-    } catch {
-      return [];
-    }
-  }, []);
+      if (!res.ok) {
+        // Handle error status (e.g., 401, 403)
+        const errorData = await res.json();
+        console.error("Failed to fetch employees:", errorData);
+        return []; // Return empty array on failure
+      }
 
+      const result = await res.json();
+      // Assume the backend returns the array directly or under a 'employees' key
+      return result.employees || result;
+    } catch (err) {
+      console.error("Network error fetching employees:", err);
+      return []; // Return empty array on network failure
+    }
+  };
   // ---------------------------------------------
   // ⭐ DELETE EMPLOYEE (Backend)
   // ---------------------------------------------
