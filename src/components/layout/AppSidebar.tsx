@@ -1,13 +1,14 @@
-import { 
-  LayoutDashboard, 
-  Users, 
-  Clock, 
-  CreditCard, 
-  Link as LinkIcon, 
-  Settings, 
+import {
+  LayoutDashboard,
+  Users,
+  Clock,
+  CreditCard,
+  Link as LinkIcon,
+  Settings,
   LogOut,
   UserPlus,
   ChevronDown,
+  Sheet,
   Building2
 } from 'lucide-react';
 import { NavLink, useLocation } from 'react-router-dom';
@@ -32,6 +33,7 @@ import { cn } from '@/lib/utils';
 const employeeNavItems = [
   { title: 'Dashboard', url: '/dashboard', icon: LayoutDashboard },
   { title: 'Attendance', url: '/dashboard/attendance', icon: Clock },
+  { title: 'Attendance Record', url: '/dashboard/attendance/history', icon: Sheet },
   { title: 'Payment Links', url: '/dashboard/payments', icon: CreditCard },
 ];
 
