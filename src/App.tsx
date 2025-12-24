@@ -13,6 +13,7 @@ import Attendance from "./pages/Attendance";
 import PaymentLinks from "./pages/PaymentLinks";
 import NotFound from "./pages/NotFound";
 import { DashboardLayout } from "./components/layout/DashboardLayout";
+import AttendanceHistory from "./pages/AttendanceHistory";
 
 const queryClient = new QueryClient();
 
@@ -31,6 +32,7 @@ const App = () => (
             <Route path="create-employee" element={<CreateEmployee />} />
             <Route path="employees" element={<Employees />} />
             <Route path="attendance" element={<Attendance />} />
+            <Route path="attendance/history" element={<AttendanceHistory />} />
             <Route path="payments" element={<PaymentLinks />} />
           </Route>
           <Route path="*" element={<NotFound />} />
