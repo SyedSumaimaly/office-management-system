@@ -7,6 +7,7 @@ import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { User, Mail, Lock, Eye, EyeOff } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import axios from 'axios';
 
 export default function EmployeeLogin() {
   const [email, setEmail] = useState('');
@@ -22,14 +23,24 @@ export default function EmployeeLogin() {
     setIsSubmitting(true);
 
     const result = await loginEmployee({ email, password });
-    
+
     if (result.success) {
       toast({ title: 'Welcome!', description: 'Logged in successfully' });
-      navigate('/dashboard');
+
+      // FIX: Use the key defined in your useAuth hook ('office_dashboard_auth')
+      const storedUser = localStorage.getItem('office_dashboard_auth');
+      const user = storedUser ? JSON.parse(storedUser) : null;
+
+      // Now user.role will correctly be 'employee'
+      if (user?.role === 'employee') {
+        navigate('/dashboard'); // Or '/employee-dashboard' if you have a separate route
+      } else {
+        navigate('/dashboard');
+      }
     } else {
       toast({ title: 'Login failed', description: result.error, variant: 'destructive' });
     }
-    
+
     setIsSubmitting(false);
   };
 
