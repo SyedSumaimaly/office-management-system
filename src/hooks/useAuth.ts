@@ -69,12 +69,40 @@ export function useAuth() {
   // Keep as placeholder until backend created
   // ---------------------------------------------
   const loginEmployee = useCallback(
-    async (): Promise<{ success: boolean; error?: string }> => {
-      return { success: false, error: "Employee login not connected to backend yet." };
-    },
-    []
-  );
+    async ({ email, password }): Promise<{ success: boolean; error?: string }> => {
+      try {
+        const response = await axios.post('http://localhost:3000/api/v1/employees/login', {
+          email,
+          password,
+        });
 
+        const { token, user: backendUser } = response.data;
+
+        // 1. Format the user object to match your AuthUser type
+        const authUser = {
+          id: backendUser.id,
+          name: backendUser.name,
+          email: backendUser.email,
+          role: backendUser.role, // This should be "employee" from your backend
+          designation: backendUser.designation,
+          createdAt: new Date().toISOString() // or backendUser.createdAt
+        };
+
+        // 2. Update React State (This triggers the Dashboard change!)
+        setUser(authUser);
+
+        // 3. Save to LocalStorage
+        localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(authUser));
+        localStorage.setItem('token', token);
+
+        return { success: true };
+      } catch (err: any) {
+        const errorMessage = err.response?.data?.error || "Cannot connect to backend server.";
+        return { success: false, error: errorMessage };
+      }
+    },
+    [setUser] // Add setUser to dependencies
+  );
   // ---------------------------------------------
   // ⭐ LOGOUT
   // ---------------------------------------------
