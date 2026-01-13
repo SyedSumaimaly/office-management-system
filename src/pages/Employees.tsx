@@ -1,10 +1,10 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '@/hooks/useAuth';
-import { Card, CardContent } from '@/components/ui/card'; // Removed unnecessary CardHeader, CardTitle
+import { Card, CardContent } from '@/components/ui/card'; 
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
-import { Users, Search, Trash2, Mail, Calendar, Loader2 } from 'lucide-react'; // Added Loader2
+import { Users, Search, Trash2, Mail, Calendar, Loader2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import {
   AlertDialog,
@@ -28,22 +28,15 @@ interface Employee {
 }
 
 export default function Employees() {
-  // Renamed getEmployees to fetchEmployees for clarity
   const { isSuperAdmin, getEmployees: fetchEmployees, deleteEmployee } = useAuth();
-
-  // STATE HOOKS for data and UI management
   const [employees, setEmployees] = useState<Employee[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [search, setSearch] = useState('');
   const [refreshKey, setRefreshKey] = useState(0);
   const { toast } = useToast();
 
-  // 1. ASYNC FETCH LOGIC wrapped in useCallback
 
-
-  // 2. EFFECT HOOK to trigger data fetching
   useEffect(() => {
-    // Define the async function inside the effect
     const loadEmployees = async () => {
       setIsLoading(true);
       try {
@@ -56,7 +49,6 @@ export default function Employees() {
         }
       } catch (error) {
         console.error("Error loading employees:", error);
-        // We don't use the 'toast' dependency here to prevent re-running the effect
       } finally {
         setIsLoading(false);
       }
@@ -68,8 +60,6 @@ export default function Employees() {
       setIsLoading(false);
     }
 
-    // DEPENDENCY ARRAY: We only depend on the stable `fetchEmployees` function 
-    // from the hook, the stable 'refreshKey', and 'isSuperAdmin'.
   }, [isSuperAdmin, refreshKey]);
 
   // --- RENDER STAGE 1: Authorization Check ---
@@ -101,7 +91,6 @@ export default function Employees() {
   );
 
   const handleDelete = async (id: string, name: string) => {
-    // Assuming deleteEmployee is now async and returns { success: boolean, error?: string }
     const result = await deleteEmployee(id);
 
     if (result?.success) {
@@ -122,7 +111,7 @@ export default function Employees() {
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
           <h2 className="text-2xl font-bold text-foreground flex items-center gap-2">
-            <Users className="h-6 w-6 text-primary" />
+            <Users className="h-6 w-6 text-primary"/>
             Employees
           </h2>
           <p className="text-muted-foreground mt-1">{employees.length} total employees</p>

@@ -7,6 +7,7 @@ export default function Dashboard() {
   const { user, isSuperAdmin, getEmployees } = useAuth();
 
   const [employees, setEmployees] = useState([]);
+  
 
   useEffect(() => {
     getEmployees().then((data) => {

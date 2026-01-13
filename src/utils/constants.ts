@@ -8,6 +8,7 @@ export const DESIGNATIONS = [
   'Admin',
   'Manager',
   'HR',
+  'Sales'
 ] as const;
 
 export const ADMIN_ROLES = ['Admin', 'Manager'] as const;
@@ -57,8 +58,8 @@ export const copyText = async (text: string): Promise<boolean> => {
 };
 
 export const generateId = (): string => {
-  return Math.random().toString(36).substring(2, 15) + 
-         Math.random().toString(36).substring(2, 15);
+  return Math.random().toString(36).substring(2, 15) +
+    Math.random().toString(36).substring(2, 15);
 };
 
 export const getTodayKey = (): string => {
